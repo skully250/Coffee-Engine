@@ -4,17 +4,29 @@ class game
 	context: null
 
 	entityList: []
+	loading = true
 
 	constructor: ->
+		engine = new engine 540, 480
+
+		@canvas = engine.canvas
+		@context = engine.context
+
+		@context.drawImage 'assets/menu/loading.png', 0, 0
+
+		world = new world 60
+
 		player = new Player 10, 10, 'assets/player.png', 0
 		entityList.push player
 
 		enemy = new Enemy 10, 10, 'assets/enemy.png', 0
 		entityList.push enemy
 
+		loading = false
+		engine.clear()
+
 	renderEntities: (entityArr) ->
-		k = 0
-		for [k...entityArr]
+		for [k=0...entityArr]
 			renderEntity[k]
 
 	renderEntity: (entity) ->
@@ -22,6 +34,9 @@ class game
 
 	render: ->
 		player.render()
+
+	updateEntity: (entity, dt) ->
+		entite.sprite.update dt
 
 	update: (dt) ->
 		now = Date.now()
@@ -52,7 +67,7 @@ class player extends entity
 		super x, y, sheet, pos
 
 	render: ->
-		super
+		super()
 
 	update: (dt) ->
 		super.update dt
@@ -63,7 +78,7 @@ class enemy extends entity
 		super x, y, sheet, pos
 
 	render: ->
-		super
+		super()
 
 	update: (dt) ->
 		super dt
@@ -73,16 +88,20 @@ class tile
 	constructor: (sheet, pos)->
 		@sprite = new Sprite img, pos, 16, 16, 0
 
-	render: ->
+	render: (x, y) ->
+		@context.drawImage @sprite, x, y
 
 	update: ->
-		
+		@sprite.update dt
+
 
 class world
 
 	constructor: (size, type) ->
 		@size = size
-		@type = type
+		@type = type or 'normal'
+		@world = []
+		@generate()
 
 	generate: ->
 		#iterate through size and generate world
@@ -91,7 +110,9 @@ class world
 			world[size][size].tile = tile.grass
 
 	render: (entityList) ->
-		for entity in entityList
-			game.renderEntity entity
+		for [k=0..@size]
+			world[size][size].tile.render size, size
 
-	update: (dt) ->
+	update: (entityList, dt) ->
+		for [k=0..@size]
+			world[size][size].tile.update dt

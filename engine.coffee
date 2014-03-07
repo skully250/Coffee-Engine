@@ -4,6 +4,9 @@ class resources
 	loading: []
 	readyCallBacks: []
 
+	constructor: ->
+		#does nothing
+
 	load: (urlOrArr) ->
 		if urlOrArr is Array
 			urlOrArr.forEach (url) ->
@@ -37,12 +40,7 @@ class resources
 	onReady: ->
 		readyCallbacks.push func
 
-	window.resources = [
-		load: load,
-		get: get,
-		onReady: onReady,
-		isReady: isReady
-	]
+	window.resources = resources
 
 class engine extends resources
 	canvas: null
@@ -70,6 +68,9 @@ class engine extends resources
 	renderBackground: ->
 		@context.fillStyle = @terrainPattern
 		@context.fillRect 0, 0, @canvas.width, @canvas.height
+
+	clear: ->
+		@context.clearRect 0, 0, @canvas.width, @canvas.height
 
 	collides: (x, y, r, b, x2, y2, r2, b2) ->
 		not (r <= x2 or x > r2 or b <= y2 or y > b2)
@@ -154,10 +155,10 @@ class input
 		pressedKeys[key] = status
 
 	document.addEventListener 'keydown', (e) -> 
-		setKey e, true
+		@setKey e, true
 
 	document.addEventListener 'keyup', (e) ->
-		setKey e, false
+		@setKey e, false
 
 	window.addEventListener 'blur', () ->
 		pressedKeys = []

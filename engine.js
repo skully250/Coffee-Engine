@@ -5,13 +5,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   resources = (function() {
-    function resources() {}
-
     resources.prototype.resourceCache = [];
 
     resources.prototype.loading = [];
 
     resources.prototype.readyCallBacks = [];
+
+    function resources() {}
 
     resources.prototype.load = function(urlOrArr) {
       if (urlOrArr === Array) {
@@ -65,14 +65,7 @@
       return readyCallbacks.push(func);
     };
 
-    window.resources = [
-      {
-        load: load,
-        get: get,
-        onReady: onReady,
-        isReady: isReady
-      }
-    ];
+    window.resources = resources;
 
     return resources;
 
@@ -113,6 +106,10 @@
     engine.prototype.renderBackground = function() {
       this.context.fillStyle = this.terrainPattern;
       return this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    };
+
+    engine.prototype.clear = function() {
+      return this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     };
 
     engine.prototype.collides = function(x, y, r, b, x2, y2, r2, b2) {
@@ -213,11 +210,11 @@
     };
 
     document.addEventListener('keydown', function(e) {
-      return setKey(e, true);
+      return this.setKey(e, true);
     });
 
     document.addEventListener('keyup', function(e) {
-      return setKey(e, false);
+      return this.setKey(e, false);
     });
 
     window.addEventListener('blur', function() {

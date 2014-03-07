@@ -5,25 +5,35 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   game = (function() {
+    var loading;
+
     game.prototype.canvas = null;
 
     game.prototype.context = null;
 
     game.prototype.entityList = [];
 
+    loading = true;
+
     function game() {
-      var enemy, player;
+      var enemy, engine, player, world;
+      engine = new engine(540, 480);
+      this.canvas = engine.canvas;
+      this.context = engine.context;
+      this.context.drawImage('assets/menu/loading.png', 0, 0);
+      world = new world(60);
       player = new Player(10, 10, 'assets/player.png', 0);
       entityList.push(player);
       enemy = new Enemy(10, 10, 'assets/enemy.png', 0);
       entityList.push(enemy);
+      loading = false;
+      engine.clear();
     }
 
     game.prototype.renderEntities = function(entityArr) {
-      var k, _i, _results;
-      k = 0;
+      var k, _i, _ref, _results;
       _results = [];
-      for (_i = k; k <= entityArr ? _i < entityArr : _i > entityArr; k <= entityArr ? _i++ : _i--) {
+      for (_i = _ref = k = 0; _ref <= entityArr ? _i < entityArr : _i > entityArr; _ref <= entityArr ? _i++ : _i--) {
         _results.push(renderEntity[k]);
       }
       return _results;
@@ -35,6 +45,10 @@
 
     game.prototype.render = function() {
       return player.render();
+    };
+
+    game.prototype.updateEntity = function(entity, dt) {
+      return entite.sprite.update(dt);
     };
 
     game.prototype.update = function(dt) {
@@ -79,7 +93,7 @@
     }
 
     player.prototype.render = function() {
-      return player.__super__.render.apply(this, arguments);
+      return player.__super__.render.call(this);
     };
 
     player.prototype.update = function(dt) {
@@ -98,7 +112,7 @@
     }
 
     enemy.prototype.render = function() {
-      return enemy.__super__.render.apply(this, arguments);
+      return enemy.__super__.render.call(this);
     };
 
     enemy.prototype.update = function(dt) {
@@ -114,9 +128,13 @@
       this.sprite = new Sprite(img, pos, 16, 16, 0);
     }
 
-    tile.prototype.render = function() {};
+    tile.prototype.render = function(x, y) {
+      return this.context.drawImage(this.sprite, x, y);
+    };
 
-    tile.prototype.update = function() {};
+    tile.prototype.update = function() {
+      return this.sprite.update(dt);
+    };
 
     return tile;
 
@@ -125,7 +143,9 @@
   world = (function() {
     function world(size, type) {
       this.size = size;
-      this.type = type;
+      this.type = type || 'normal';
+      this.world = [];
+      this.generate();
     }
 
     world.prototype.generate = function() {
@@ -138,16 +158,22 @@
     };
 
     world.prototype.render = function(entityList) {
-      var _i, _len, _results;
+      var k, _i, _ref, _ref1, _results;
       _results = [];
-      for (_i = 0, _len = entityList.length; _i < _len; _i++) {
-        entity = entityList[_i];
-        _results.push(game.renderEntity(entity));
+      for (_i = _ref = k = 0, _ref1 = this.size; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; _ref <= _ref1 ? _i++ : _i--) {
+        _results.push(world[size][size].tile.render(size, size));
       }
       return _results;
     };
 
-    world.prototype.update = function(dt) {};
+    world.prototype.update = function(entityList, dt) {
+      var k, _i, _ref, _ref1, _results;
+      _results = [];
+      for (_i = _ref = k = 0, _ref1 = this.size; _ref <= _ref1 ? _i <= _ref1 : _i >= _ref1; _ref <= _ref1 ? _i++ : _i--) {
+        _results.push(world[size][size].tile.update(dt));
+      }
+      return _results;
+    };
 
     return world;
 
