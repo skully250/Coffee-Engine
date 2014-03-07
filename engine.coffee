@@ -1,5 +1,48 @@
 class resources
-	constructor: ->
+
+	resourceCache: []
+	loading: []
+	readyCallBacks: []
+
+	load: (urlOrArr) ->
+		if urlOrArr is Array
+			urlOrArr.forEach (url) ->
+				_load url
+		else
+			_load urlOrArr
+
+	_load: (url) ->
+		if resourceCache[url]
+			resourceCache[url]
+		else
+			img = new Image()
+			img.onLoad = () ->
+				resourceCache[url] = img
+
+				if isReady()
+					readyCallbacks.forEach (func) -> func()
+
+			resourceCache[url] = false
+			img.src = url
+
+	get: (url) ->
+		resourceCache[url]
+
+	isReady: ->
+		ready = true
+		for k in resourceCache
+			if resourceCache.hasOwnProperty[k] and !resourceCache[k]
+				ready = false
+
+	onReady: ->
+		readyCallbacks.push func
+
+	window.resources = [
+		load: load,
+		get: get,
+		onReady: onReady,
+		isReady: isReady
+	]
 
 class engine extends resources
 	canvas: null
@@ -45,12 +88,84 @@ class Sprite extends engine
 	constructor: (url, pos, size, speed, frames, dir, once) ->
 		@pos = pos
 		@size = size
-		if speed is 'number'
-			@speed = 0
-		else
-			@speed = speed
+		@speed = 0 if speed is not 'number'
 		@frames = frames
 		@_index = 0
 		@url = url
 		@dir = dir or 'horizontal'
 		@once = once
+
+	update: (delta) ->
+		@_index += @speed * delta
+
+	render: (context) ->
+		if speed > 0
+			max = @frames.length
+			idx = Math.floor(@_index)
+			frame = @frames[idx % max]
+
+			if (@once and idx >= max)
+				@done = true
+				return
+		else
+			frame = 0
+
+		x = @pos[0]
+		y = @pos[1]
+
+		if @dir is 'vertical'
+			y += frame * @size[1]
+		else
+			x += frame * @size[0]
+
+		img = resources.get @url
+		context.drawImage img, x, y, @size[0], @size[1], 0, 0, @size[0], @size[1]
+
+window.Sprite = Sprite
+
+class input
+
+	pressedKeys: []
+	keyDown: []
+
+	setKey: (event, status) ->
+		code = event.keyCode
+		key: null
+
+		switch code
+		 when 32
+		 	key = 'SPACE'
+		 	break
+		 when 37
+		 	key = 'LEFT'
+		 	break
+		 when 38
+		 	key = 'UP'
+		 	break
+		 when 39
+		 	key = 'RIGHT'
+		 	break
+		 when 40
+		 	key = 'DOWN'
+		 	break
+		 else
+		 	key = String.fromCharCode(code)
+
+		pressedKeys[key] = status
+
+	document.addEventListener 'keydown', (e) -> 
+		setKey e, true
+
+	document.addEventListener 'keyup', (e) ->
+		setKey e, false
+
+	window.addEventListener 'blur', () ->
+		pressedKeys = []
+
+	window.input = [
+		isDown: (key) ->
+			pressedKeys[key.toUpperCase()]
+
+		isPressed: (key) ->
+			key == keyDown
+		]
