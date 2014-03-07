@@ -140,7 +140,7 @@
       this._index = 0;
       this.url = url;
       this.dir = dir || 'horizontal';
-      this.once = once;
+      this.once = once || false;
     }
 
     Sprite.prototype.update = function(delta) {

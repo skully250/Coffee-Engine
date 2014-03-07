@@ -93,7 +93,7 @@ class Sprite extends engine
 		@_index = 0
 		@url = url
 		@dir = dir or 'horizontal'
-		@once = once
+		@once = once or false
 
 	update: (delta) ->
 		@_index += @speed * delta
