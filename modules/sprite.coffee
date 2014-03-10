@@ -1,14 +1,14 @@
 class Sprite extends engine
 
-	constructor: (url, pos, size, speed, frames, dir, once) ->
+	constructor: (url, pos, size, speed, frames, dir='horizontal', once=false) ->
 		@pos = pos
 		@size = size
-		@speed = 0 if speed is not 'number'
+		@speed = 0 if speed isnt 'number'
 		@frames = frames
 		@_index = 0
 		@url = url
-		@dir = dir or 'horizontal'
-		@once = once or false
+		@dir = dir
+		@once = once
 
 	update: (delta) ->
 		@_index += @speed * delta

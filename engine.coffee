@@ -7,6 +7,8 @@ class engine extends resources
 		@context = @canvas.getContext '2d'
 		@setSize(512, 480)
 		document.body.appendChild(@canvas)
+		@resources = new Resources()
+		@pattern = resources.get 'assets/images/terrain.png', 'repeat'
 
 	setSize: (width, height) ->
 		size = [width, height]
@@ -19,7 +21,7 @@ class engine extends resources
 		if full is false
 			@terrainPattern = @context.drawImage imageLoc, 0, 0
 		else
-			@terrainPatter = @context.createPattern resources.get 'assets/images/test/terrain.png', 'repeat'
+			@terrainPatter = @context.createPattern @pattern
 
 	renderBackground: ->
 		@context.fillStyle = @terrainPattern
